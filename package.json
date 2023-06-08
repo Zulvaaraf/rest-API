@@ -1,0 +1,30 @@
+{
+  "name": "openmusic-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start-dev": "nodemon ./src/server.js",
+    "migrate": "node-pg-migrate",
+    "lint": "lint ./src"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zulvaaraf/openmusic-api/issues"
+  },
+  "homepage": "https://github.com/Zulvaaraf/openmusic-api#readme",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.2",
+    "joi": "^17.9.2",
+    "nanoid": "^3.3.6",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "eslint": "^8.42.0"
+  }
+}
