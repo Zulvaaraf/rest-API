@@ -5,6 +5,7 @@ const Hapi = require('@hapi/hapi');
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const AlbumsValidator = require('./validator/albums');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -47,7 +48,7 @@ const init = async () => {
 
       const newResponse = h.response({
         status: 'error',
-        message: response.message,
+        message: 'Maaf terjadi kegagalan pada server kami..',
       });
       console.log(response.message);
       newResponse.code(500);
