@@ -47,9 +47,20 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui album, Id tidak ditemukan');
+    }
+  }
+
+  async deleteAlbumById(id) {
+    const query = {
+      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('Gagal menghapus album, Id tidak ditemukan');
     }
   }
 }
