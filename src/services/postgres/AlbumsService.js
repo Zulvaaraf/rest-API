@@ -11,10 +11,12 @@ class AlbumsService {
 
   async addAlbum({ name, year }) {
     const id = nanoid(16);
+    const createdAt = new Date().toISOString();
+    const updatedAt = createdAt;
 
     const query = {
-      text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
-      values: [id, name, year],
+      text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
+      values: [id, name, year, createdAt, updatedAt],
     };
 
     const result = await this._pool.query(query);
@@ -35,6 +37,20 @@ class AlbumsService {
       throw new NotFoundError('Album tidak ditemukan');
     }
     return result.rows.map(mapDBToModelAlbums)[0];
+  }
+
+  async editAlbumById(id, { name, year }) {
+    const updatedAt = new Date().toISOString();
+    const query = {
+      text: 'UPDATE albums SET name = $1, year = $2, created_at = $3 WHERE id = $4 RETURNING id',
+      values: [name, year, updatedAt, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Gagal memperbarui album, Id tidak ditemukan');
+    }
   }
 }
 
