@@ -63,6 +63,19 @@ class SongsValidator {
 
     return result.rows.map(mapDBTtoModelSongs)[0];
   }
+
+  async editSongById(id, { title, year, genre, performer, duration, albumId }) {
+    const updatedAt = new Date().toISOString();
+    const query = {
+      text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, "albumId" = $6, "updatedAt" = $7 WHERE id = $8 RETURNING id',
+      values: [title, year, genre, performer, duration, albumId, updatedAt, id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('Gagal memperbarui lagu, Id tidak ditemukan');
+    }
+  }
 }
 
 module.exports = SongsValidator;
