@@ -27,15 +27,12 @@ class AlbumsHandler {
   }
 
   async getAlbumByIdHandler(request) {
-    this._validator.validateAlbumPayload(request.payload);
     const { id } = request.params;
-    const { title, performer } = request.query;
     const album = await this._service.getAlbumById(id);
-    const songs = await this._service.getSongsByAlbumId({ title, performer });
     return {
       status: 'success',
       data: {
-        album: { ...album, songs },
+        album,
       },
     };
   }
