@@ -13,11 +13,10 @@ class AlbumsService {
   async addAlbum({ name, year }) {
     const id = nanoid(16);
     const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
 
     const query = {
-      text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
-      values: [id, name, year, createdAt, updatedAt],
+      text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $4) RETURNING id',
+      values: [id, name, year, createdAt],
     };
 
     const result = await this._pool.query(query);
@@ -37,7 +36,7 @@ class AlbumsService {
     if (!result.rowCount) {
       throw new NotFoundError('Album tidak ditemukan');
     }
-    return result.rows.map(mapDBToModelAlbums)[0];
+    return mapDBToModelAlbums(result.rows);
   }
 
   async getSongsInAlbum(id) {
@@ -47,11 +46,11 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    // if (!result.rowCount) {
-    //   throw new NotFoundError('Daftar lagu tidak ditemukan');
-    // }
+    if (!result.rowCount) {
+      throw new NotFoundError('Daftar lagu tidak ditemukan');
+    }
 
-    return result.rows.map(mapDBTtoModelSongs);
+    return mapDBTtoModelSongs(result.rows);
   }
 
   async editAlbumById(id, { name, year }) {
