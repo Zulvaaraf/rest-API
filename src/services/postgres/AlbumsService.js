@@ -46,11 +46,11 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rowCount) {
-      throw new NotFoundError('Daftar lagu tidak ditemukan');
-    }
+    // if (!result.rowCount) {
+    //   throw new NotFoundError('Daftar lagu tidak ditemukan');
+    // }
 
-    return mapDBTtoModelSongs(result.rows);
+    return result.rows.map(mapDBTtoModelSongs);
   }
 
   async editAlbumById(id, { name, year }) {
