@@ -46,10 +46,6 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    // if (!result.rowCount) {
-    //   throw new NotFoundError('Daftar lagu tidak ditemukan');
-    // }
-
     return result.rows.map(mapDBTtoModelSongs);
   }
 
