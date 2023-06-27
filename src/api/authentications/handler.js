@@ -23,7 +23,6 @@ class AuthenticationsHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'Authentication berhasil ditambahkan',
       data: {
         accessToken,
         refreshToken,
@@ -43,7 +42,6 @@ class AuthenticationsHandler {
     const accessToken = this._tokenManager.generateAccessToken({ id });
     return {
       status: 'success',
-      message: 'Access token diperbarui',
       data: {
         accessToken,
       },
