@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
+// const { mapDBTtoModelPlaylists } = require('../../utils/indexPlaylists');
 // const NotFoundError = require('../../exceptions/NotFoundError');
 // const AuthorizationError = require('../../exceptions/AuthorizationError');
 
@@ -23,6 +24,16 @@ class PlaylistsService {
     }
 
     return result.rows[0].id;
+  }
+
+  async getPlaylists(owner) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE owner = $1',
+      values: [owner],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 
   // async verifyPlaylistOwner(id, owner) {
