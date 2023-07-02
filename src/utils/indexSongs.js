@@ -1,13 +1,13 @@
-const mapDBTtoModelSongs = ({ id, title, year, genre, performer, duration, albumId, created_at, updated_at }) => ({
+const mapDBTtoModelSongs = ({ id, title, year, genre, performer, duration, album_id, created_at, updated_at }) => ({
   id,
   title,
   year,
   genre,
   performer,
   duration,
-  albumId,
-  created_at,
-  updated_at,
+  albumId: album_id,
+  createdAt: created_at,
+  updatedAt: updated_at,
 });
 
 module.exports = { mapDBTtoModelSongs };
