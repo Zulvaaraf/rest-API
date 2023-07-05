@@ -37,10 +37,32 @@ class PlaylistsService {
     return result.rows;
   }
 
-  async deletePlaylistById(id) {
+  async getPlaylistsById(playlistId) {
     const query = {
-      text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
-      values: [id],
+      text: `SELECT playlists.id, playlists.name, user.username FROM playlists
+      LEFT JOIN users ON users.id = playlists.owner
+      WHERE playlists.id = $1`,
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0];
+  }
+
+  async getOwnerPlaylistById(playlistId) {
+    const query = {
+      text: 'SELECT playlists.owner FROM playlists WHERE id = $1',
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0].owner;
+  }
+
+  async deletePlaylistById(id, owner) {
+    const query = {
+      text: 'DELETE FROM playlists WHERE id = $1 AND owner = $2 RETURNING id',
+      values: [id, owner],
     };
 
     const result = await this._pool.query(query);
@@ -51,8 +73,8 @@ class PlaylistsService {
 
   async verifyPlaylistOwner(id, owner) {
     const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1 AND owner = $2 RETURNING id',
-      values: [id, owner],
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [id],
     };
 
     const result = await this._pool.query(query);
@@ -62,6 +84,22 @@ class PlaylistsService {
 
     const playlist = result.rows[0];
     if (playlist.owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    const query = {
+      text: 'SELECT * FROM  playlists WHERE id = $1',
+      values: [playlistId],
+    };
+
+    const { rows } = await this._pool.query(query);
+    if (!rows.length) {
+      throw new NotFoundError('Playlists tidak ditemukan');
+    }
+
+    if (!rows[0].owner !== userId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
