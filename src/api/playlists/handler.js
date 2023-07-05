@@ -1,6 +1,6 @@
 class PlaylistsHandler {
-  constructor(playlistsService, validator) {
-    this._playlistsService = playlistsService;
+  constructor(service, validator) {
+    this._service = service;
     this._validator = validator;
 
     this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
@@ -14,7 +14,7 @@ class PlaylistsHandler {
     const { name } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
-    const playlistId = await this._playlistsService.addPlaylist({ name, owner: credentialId });
+    const playlistId = await this._service.addPlaylist({ name, owner: credentialId });
     const response = h.response({
       status: 'success',
       data: {
@@ -27,7 +27,7 @@ class PlaylistsHandler {
 
   async getPlaylistsHandler(request) {
     const { id: credentialId } = request.auth.credentials;
-    const playlists = await this._playlistsService.getPlaylists(credentialId);
+    const playlists = await this._service.getPlaylists(credentialId);
     return {
       status: 'success',
       data: {
@@ -40,8 +40,8 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._playlistsService.verifyPlaylistOwner(id, credentialId);
-    await this._playlistsService.deletePlaylistById(id);
+    await this._service.verifyPlaylistOwner(id, credentialId);
+    await this._service.deletePlaylistById(id, credentialId);
     return {
       status: 'success',
       message: 'Playlists berhasil dihapus',
