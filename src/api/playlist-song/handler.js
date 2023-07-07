@@ -6,6 +6,7 @@ class PlaylistSongsHandler {
     this._validator = validator;
 
     this.postPlaylistSongsHandler = this.postPlaylistSongsHandler.bind(this);
+    this.getPlaylistSongsHandler = this.getPlaylistSongsHandler.bind(this);
   }
 
   async postPlaylistSongsHandler(request, h) {
@@ -15,10 +16,11 @@ class PlaylistSongsHandler {
     const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
-    await this._playlistSongsService.verifySongId(songId);
+    await this._songsService.getSongById(songId);
+    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
     const playlistSongId = await this._playlistSongsService.addPlaylistSong({ playlistId, songId });
+    console.log(playlistSongId);
     const response = h.response({
       status: 'success',
       message: 'Berhasil menambahkan lagu',
@@ -28,6 +30,24 @@ class PlaylistSongsHandler {
     });
     response.code(201);
     return response;
+  }
+
+  async getPlaylistSongsHandler(request) {
+    const { id: playlistId } = request.params;
+    const { id: owner } = request.auth.credentials;
+
+    await this._playlistsService.verifyPlaylistOwner(playlistId, owner);
+
+    const playlists = await this._playlistsService.getPlaylistById(owner, playlistId);
+    const songs = await this._playlistSongsService.getSongsByPlaylistId(playlistId);
+    playlists.songs = songs;
+
+    return {
+      status: 'success',
+      data: {
+        playlist: playlists,
+      },
+    };
   }
 }
 

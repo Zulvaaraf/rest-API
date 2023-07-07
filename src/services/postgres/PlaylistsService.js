@@ -37,38 +37,16 @@ class PlaylistsService {
     return result.rows;
   }
 
-  async getPlaylistsById(playlistId) {
+  async getPlaylistById(owner, playlistId) {
     const query = {
-      text: `SELECT playlists.id, playlists.name, user.username FROM playlists
-      LEFT JOIN users ON users.id = playlists.owner
-      WHERE playlists.id = $1`,
-      values: [playlistId],
+      text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+      LEFT JOIN users ON playlists.owner = users.id
+      WHERE owner = $1 AND playlists.id = $2`,
+      values: [owner, playlistId],
     };
 
     const result = await this._pool.query(query);
     return result.rows[0];
-  }
-
-  async getOwnerPlaylistById(playlistId) {
-    const query = {
-      text: 'SELECT playlists.owner FROM playlists WHERE id = $1',
-      values: [playlistId],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows[0].owner;
-  }
-
-  async deletePlaylistById(id, owner) {
-    const query = {
-      text: 'DELETE FROM playlists WHERE id = $1 AND owner = $2 RETURNING id',
-      values: [id, owner],
-    };
-
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
-      throw new NotFoundError('Gagal menghapus playlists. Id tidak ditemukan');
-    }
   }
 
   async verifyPlaylistOwner(id, owner) {
@@ -88,21 +66,15 @@ class PlaylistsService {
     }
   }
 
-  async verifyPlaylistAccess(playlistId, userId) {
-    const query = {
-      text: 'SELECT * FROM  playlists WHERE id = $1',
-      values: [playlistId],
-    };
-
-    const { rows } = await this._pool.query(query);
-    if (!rows.length) {
-      throw new NotFoundError('Playlists tidak ditemukan');
-    }
-
-    if (!rows[0].owner !== userId) {
-      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
-    }
-  }
+  // async verifyPlaylistAccess(playlistId, userId) {
+  //   try {
+  //     await this.verifyPlaylistOwner(playlistId, userId);
+  //   } catch (error) {
+  //     if (error instanceof NotFoundError) {
+  //       throw error;
+  //     }
+  //   }
+  // }
 }
 
 module.exports = PlaylistsService;
