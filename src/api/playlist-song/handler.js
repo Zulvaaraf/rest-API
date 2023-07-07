@@ -7,6 +7,7 @@ class PlaylistSongsHandler {
 
     this.postPlaylistSongsHandler = this.postPlaylistSongsHandler.bind(this);
     this.getPlaylistSongsHandler = this.getPlaylistSongsHandler.bind(this);
+    this.deletePlaylistSongHandler = this.deletePlaylistSongHandler.bind(this);
   }
 
   async postPlaylistSongsHandler(request, h) {
@@ -20,7 +21,6 @@ class PlaylistSongsHandler {
     await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
     const playlistSongId = await this._playlistSongsService.addPlaylistSong({ playlistId, songId });
-    console.log(playlistSongId);
     const response = h.response({
       status: 'success',
       message: 'Berhasil menambahkan lagu',
@@ -47,6 +47,22 @@ class PlaylistSongsHandler {
       data: {
         playlist: playlists,
       },
+    };
+  }
+
+  async deletePlaylistSongHandler(request) {
+    this._validator.validatePlaylistSongPayload(request.payload);
+
+    const { songId } = request.payload;
+    const { id: playlistId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._songsService.getSongById(songId);
+    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistSongsService.deletePlaylistSong(songId);
+    return {
+      status: 'success',
+      message: 'Lagu di playlists berhasil dihapus',
     };
   }
 }
