@@ -142,7 +142,6 @@ const init = async () => {
           message: response.message,
         });
         newResponse.code(response.statusCode);
-        console.log(response.message);
         return newResponse;
       }
 

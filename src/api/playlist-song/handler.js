@@ -18,7 +18,7 @@ class PlaylistSongsHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._songsService.getSongById(songId);
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
 
     const playlistSongId = await this._playlistSongsService.addPlaylistSong({ playlistId, songId });
     const response = h.response({
