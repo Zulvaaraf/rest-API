@@ -11,7 +11,7 @@ class AlbumsService {
   }
 
   async addAlbum({ name, year }) {
-    const id = nanoid(16);
+    const id = `albums-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
 
     const query = {
@@ -20,7 +20,7 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rowCount) {
+    if (!result.rows.length) {
       throw new InvariantError('Album gagal ditambahkan');
     }
     return result.rows[0].id;
@@ -41,7 +41,7 @@ class AlbumsService {
 
   async getSongsInAlbum(id) {
     const query = {
-      text: 'SELECT id, title, performer FROM songs WHERE "albumId" = $1',
+      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
       values: [id],
     };
 
