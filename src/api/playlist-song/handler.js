@@ -57,9 +57,8 @@ class PlaylistSongsHandler {
     const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._songsService.getSongById(songId);
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
-    await this._playlistSongsService.deletePlaylistSong(songId);
+    await this._playlistSongsService.deletePlaylistSong(playlistId, songId);
     return {
       status: 'success',
       message: 'Lagu di playlists berhasil dihapus',
