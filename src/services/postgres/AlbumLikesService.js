@@ -25,19 +25,42 @@ class AlbumLikeService {
       if (!insertResult.rowCount) {
         throw new InvariantError('Gagal menambahkan album yang disukai');
       }
+      await this._cacheService.delete(`likes:${albumId}`);
       return insertResult.rows;
-    } else {
-      const deleteLikeAlbum = {
-        text: 'DELETE FROM user_album_likes WHERE album_id = $1 AND user_id = $2',
-        values: [albumId, userId],
-      };
+    }
+  }
 
-      const deleteResult = await this._pool.query(deleteLikeAlbum);
-      if (!deleteResult.rowCount) {
-        throw new InvariantError('Gagal menghapus album yang disukai');
-      }
+  async deleteLikeAlbum(userId, albumId) {
+    const query = {
+      text: 'DELETE FROM user_album_likes WHERE album_id = $1 AND user_id = $2',
+      values: [albumId, userId],
+    };
+
+    const deleteResult = await this._pool.query(query);
+    if (!deleteResult.rowCount) {
+      throw new InvariantError('Gagal menghapus album yang disukai');
     }
     await this._cacheService.delete(`likes:${albumId}`);
+    return deleteResult.rows;
+  }
+
+  async getLikeAlbum(albumId) {
+    try {
+      const result = await this._cacheService.get(`likes:${albumId}`);
+      return {
+        likes: JSON.parse(result),
+        isCache: 1,
+      };
+    } catch (error) {
+      const query = {
+        text: 'SELECT user_id FROM user_album_likes WHERE album_id = $1',
+        values: [albumId],
+      };
+
+      const result = await this._pool.query(query);
+      await this._cacheService.set(`likes:${albumId}`, JSON.stringify(result.rowCount));
+      return { likes: result.rowCount };
+    }
   }
 
   async checkLike(albumId, userId) {
@@ -51,8 +74,6 @@ class AlbumLikeService {
       throw new InvariantError('Gagal menambahkan album yang disukai');
     }
   }
-
-  async getLikeAlbum() {}
 }
 
 module.exports = AlbumLikeService;
