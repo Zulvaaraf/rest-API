@@ -30,6 +30,9 @@ const playlistSongs = require('./api/playlist-song');
 const PlaylistSongsService = require('./services/postgres/PlaylistsSongService');
 const PlaylistSongsValidator = require('./validator/playlist-song');
 
+const playlistSongsActivity = require('./api/playlist-song-activites');
+const PlaylistSongsActivitiesService = require('./services/postgres/PlaylistActivitiesService');
+
 const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
@@ -59,6 +62,7 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const playlistSongsService = new PlaylistSongsService(collaborationsService);
+  const playlistSongsActivityService = new PlaylistSongsActivitiesService();
   const coverAlbumService = new CoverAlbumService();
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
   const albumLikesService = new AlbumLikesService(cacheService);
@@ -139,10 +143,18 @@ const init = async () => {
     {
       plugin: playlistSongs,
       options: {
+        playlistSongsActivityService: playlistSongsActivityService,
         playlistsService: playlistsService,
         playlistSongsService: playlistSongsService,
         songsService: songsService,
         validator: PlaylistSongsValidator,
+      },
+    },
+    {
+      plugin: playlistSongsActivity,
+      options: {
+        playlistsService,
+        playlistActivitesService: playlistSongsActivityService,
       },
     },
     {
