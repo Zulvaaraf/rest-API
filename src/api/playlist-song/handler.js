@@ -1,7 +1,8 @@
 const autoBind = require('auto-bind');
 
 class PlaylistSongsHandler {
-  constructor(playlistSongsService, playlistsService, songsService, validator) {
+  constructor(playlistSongsActivitiyService, playlistSongsService, playlistsService, songsService, validator) {
+    this._playlistSongsActivityService = playlistSongsActivitiyService;
     this._playlistSongsService = playlistSongsService;
     this._playlistsService = playlistsService;
     this._songsService = songsService;
@@ -19,6 +20,7 @@ class PlaylistSongsHandler {
 
     await this._songsService.getSongById(songId);
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+    await this._playlistSongsActivityService.postActivity(playlistId, songId, credentialId, 'add');
 
     const playlistSongId = await this._playlistSongsService.addPlaylistSong({ playlistId, songId });
     const response = h.response({
@@ -59,6 +61,8 @@ class PlaylistSongsHandler {
 
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistSongsService.deletePlaylistSong(playlistId, songId);
+    await this._playlistSongsActivityService.postActivity(playlistId, songId, credentialId, 'delete');
+
     return {
       status: 'success',
       message: 'Lagu di playlists berhasil dihapus',
